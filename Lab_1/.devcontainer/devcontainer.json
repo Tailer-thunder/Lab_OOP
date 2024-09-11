@@ -1,5 +1,5 @@
 {
-    "name": "C++ MAI Lecture Examples",
+    "name": "Lab 1",
     "dockerFile": "Dockerfile",
     "context": "..",
     "appPort": [],
