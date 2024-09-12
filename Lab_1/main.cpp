@@ -9,7 +9,7 @@ int main(){
         if (!(std::cin >> upper_limit)) {
             std::cin.clear();
             std::cin.ignore();
-            std::cout << "Wrong input" << std::endl << std::endl;
+            std::cout << "Wrong input" << std::endl;
             continue;
         }
         if (upper_limit > 0){
@@ -17,7 +17,7 @@ int main(){
         }else {
             std::cin.clear();
             std::cin.ignore();
-            std::cout << "The number must be greater than zero" << std::endl << std::endl;
+            std::cout << "The number must be greater than zero" << std::endl;
             continue;
         }
     }
