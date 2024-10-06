@@ -32,7 +32,7 @@ class Thirteen {
 
         std::ostream& print(std::ostream& os) const;
 
-        virtual ~Thirteen();
+        virtual ~Thirteen() noexcept;
 };
 
 #endif

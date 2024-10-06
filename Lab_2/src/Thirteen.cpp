@@ -1,6 +1,6 @@
 #include "../include/Thirteen.hpp"
 #include <iostream>
-
+#include <algorithm>
 
 
 bool isThirteen(unsigned char t) {
@@ -29,26 +29,27 @@ Thirteen::Thirteen(const size_t& n, unsigned char t) {
 
 
 Thirteen::Thirteen(const std::initializer_list<unsigned char>& t) {
-    for (auto a : t) {
-        if (!isThirteen(a)) throw std::invalid_argument("Некорректный символ");
+    for (auto symbol : t) {
+        if (!isThirteen(symbol)) {
+            throw std::invalid_argument("Некорректный символ");
+        }
     }
-
-    size_t zeros = 0;
-    for (auto c : t) {
-        if (c == '0') {
-            zeros += 1;
-        } else break;
+    size_t leadingZeros = 0;
+    for (auto symbol : t) {
+        if (symbol == '0') {
+            ++leadingZeros;
+        } else {
+            break;
+        }
     }
-    size = t.size() - zeros;
+    size = t.size() - leadingZeros;
     if (size == 0) {
         size = 1;
         array = new unsigned char[1]{'0'};
     } else {
         array = new unsigned char[size];
-        size_t i = 0;
-        for (auto it = t.end() - 1; it != t.begin() - 1 + zeros; --it) {
-            array[i++] = *it;
-        }
+        auto it = t.begin() + leadingZeros;
+        std::copy(it, t.end(), array);
     }
 }
 
@@ -114,7 +115,7 @@ bool Thirteen::operator<(const Thirteen& other) const {
     } else {
         int a, b;
         for (int i = static_cast<int>(size) - 1; i >= 0; i--) {
-            a = (array[i] >= 'A') ? (array[i] - 'A' + 10) : (array[i] - '0');
+            a = (array[i] >= 'A') ? (array[i] - 'A' + 10) : (array[i] - '0'); //<переменная> = (условие) ? (значение_если_условие_истинно) : (значение_если_условие_ложно);
             b = (other.array[i] >= 'A') ? (other.array[i] - 'A' + 10) : (other.array[i] - '0');
             if (a < b) return true;
             else if (a > b) return false;
@@ -179,7 +180,7 @@ Thirteen& Thirteen::operator+=(const Thirteen& other) {
     array = new unsigned char[size];
     
     for (size_t i = 0; i < size; i++) {
-        array[i] = res[i];
+        array[i] = res[size - i - 1];
     }
 
     return *this;
@@ -218,9 +219,8 @@ Thirteen& Thirteen::operator-=(const Thirteen& other) {
     array = new unsigned char[size];
 
     for (size_t i = 0; i < size; i++) {
-        array[i] = res[i];
+        array[i] = res[size - i - 1];
     }
-
     return *this;
 }
 

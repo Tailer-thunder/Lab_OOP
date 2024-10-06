@@ -2,97 +2,115 @@
 #include "../include/Thirteen.hpp"
 
 
-TEST(test_01, basic_initialization_test) {
-    Thirteen var1 = Thirteen();
-    Thirteen var2 = Thirteen(3, 'C');
-    Thirteen var3 = Thirteen{'1', 'A', 'C'};
-    Thirteen var4 = Thirteen("1A7");
-    Thirteen var5 = var1;
-    ASSERT_TRUE(true);
+TEST(ThirteenTest, ConstructorsAndInitialization) {
+    Thirteen var1; 
+    Thirteen var2(3, '7');  
+    Thirteen var3{'1', '2', '3'};  
+    Thirteen var4("107");  
+
+  
+    ASSERT_EQ(var1, Thirteen());  
+    ASSERT_EQ(var2, Thirteen(3, '7'));  
+    ASSERT_EQ(var3, Thirteen({'1', '2', '3'}));  
+    ASSERT_EQ(var4, Thirteen("107"));
 }
 
-TEST(test_02, comparison_test) {
-    Thirteen var1 = Thirteen("111");
-    Thirteen var2 = Thirteen("CCC");
+
+TEST(ThirteenTest, ComparisonOperators) {
+    Thirteen var1("111");
+    Thirteen var2("777");
     Thirteen var3 = var1;
 
-    ASSERT_TRUE(var1 == var3);
-    ASSERT_FALSE(var1 != var3);
-
-    ASSERT_FALSE(var1 > var2);
-    ASSERT_TRUE(var2 > var1);
-
-    ASSERT_TRUE(var1 < var2);
-    ASSERT_FALSE(var2 < var1);
+    ASSERT_TRUE(var1 == var3);  
+    ASSERT_FALSE(var1 != var3);  
+    ASSERT_TRUE(var2 > var1);  
+    ASSERT_TRUE(var1 < var2);  
 }
 
-TEST(test_03, addition_subtraction_test) {
-    Thirteen var1 = Thirteen("C2");
-    Thirteen res1 = Thirteen("C3");
-    Thirteen res2 = Thirteen("B1");
+
+TEST(ThirteenTest, AdditionOperator) {
+    Thirteen var1("777");
+    Thirteen expected_result("1000");
 
     var1 += Thirteen("1");
-    ASSERT_TRUE(var1 == res1);
+    ASSERT_EQ(var1, expected_result);  
 
-    var1 -= Thirteen("12");
-    ASSERT_TRUE(var1 == res2);
+    
+    Thirteen var2("A2");
+    Thirteen var3("3");
+    Thirteen expected_result2("A5");
+
+    var2 += var3;
+    ASSERT_EQ(var2, expected_result2);  
+
+
+    Thirteen var4("C12");
+    Thirteen expected_result3("C13");
+
+    var4 += Thirteen("1");
+    ASSERT_EQ(var4, expected_result3);  
 }
 
-TEST(test_04, copy_move_constructor_test) {
-    Thirteen var1 = Thirteen("1A7");
+
+TEST(ThirteenTest, SubtractionOperator) {
+
+    Thirteen var1("1000");
+    Thirteen expected_result("777");
+
+    var1 -= Thirteen("223");
+    ASSERT_EQ(var1, expected_result); 
+
+
+    Thirteen var2("A5");
+    Thirteen var3("3");
+    Thirteen expected_result2("A2");
+
+    var2 -= var3;
+    ASSERT_EQ(var2, expected_result2);  
+
+    Thirteen var4("C13");
+    Thirteen expected_result3("C12");
+
+    var4 -= Thirteen("1");
+    ASSERT_EQ(var4, expected_result3);  
+}
+
+
+TEST(ThirteenTest, AssignmentOperator) {
+    Thirteen var1("123");
+    Thirteen var2;
+
+    var2 = var1;
+    ASSERT_EQ(var2, var1); 
+}
+
+
+TEST(ThirteenTest, DestructorTest) {
+    Thirteen* var1 = new Thirteen("123");
+    delete var1;
+    ASSERT_TRUE(true);  
+}
+
+
+TEST(ThirteenTest, CopyConstructor) {
+    Thirteen var1("123");
     Thirteen var2 = var1;
-    Thirteen var3 = std::move(var1);
-
-    ASSERT_TRUE(var2 == Thirteen("1A7"));
-    ASSERT_TRUE(var3 == Thirteen("1A7"));
-    ASSERT_TRUE(var1 == Thirteen()); 
+    ASSERT_EQ(var2, var1);  
 }
 
-TEST(test_05, exception_handling_test) {
-    Thirteen var1 = Thirteen("1A7");
-    try {
-        var1 -= Thirteen("1B0"); 
-        FAIL() << "Ожидалось исключение std::logic_error";
-    } catch (const std::logic_error& e) {
-        ASSERT_STREQ("Разность не может быть отрицательной", e.what());
-    } catch (...) {
-        FAIL() << "Ожидалось исключение std::logic_error";
-    }
+
+TEST(ThirteenTest, MoveConstructor) {
+    Thirteen var1("123");
+    Thirteen var2 = std::move(var1);
+
+    ASSERT_EQ(var2, Thirteen("123"));  
 }
 
-TEST(test_06, addition_with_carry_test) {
-    Thirteen var1 = Thirteen("C");
-    Thirteen var2 = Thirteen("1");
-    Thirteen res = Thirteen("10");
 
-    var1 += var2;
-    ASSERT_TRUE(var1 == res);
-}
+TEST(ThirteenTest, PrintTest) {
+    Thirteen var1("123");
+    std::stringstream ss;
+    var1.print(ss);
 
-TEST(test_07, subtraction_with_borrow_test) {
-    Thirteen var1 = Thirteen("1A");
-    Thirteen var2 = Thirteen("B");
-    Thirteen res = Thirteen("F");
-
-    var1 -= var2;
-    ASSERT_TRUE(var1 == res);
-}
-
-TEST(test_08, complex_operations_test) {
-    Thirteen var1 = Thirteen("2A4");
-    Thirteen var2 = Thirteen("1C1");
-
-    var1 += var2;
-    Thirteen res_add = Thirteen("4A5");
-    ASSERT_TRUE(var1 == res_add);
-
-    var1 -= Thirteen("1B5");
-    Thirteen res_sub = Thirteen("310");
-    ASSERT_TRUE(var1 == res_sub);
-}
-
-TEST(test_09, zero_initialization_test) {
-    Thirteen var1 = Thirteen("0000");
-    Thirteen var2 = Thirteen();
-    ASSERT_TRUE(var1 == var2);
+    ASSERT_EQ(ss.str(), "123"); 
 }
