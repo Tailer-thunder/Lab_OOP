@@ -288,7 +288,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Labs_OOP\Lab_5\src\dynamic_array.cpp" />
     <ClCompile Include="C:\Labs_OOP\Lab_5\src\memory_resource.cpp" />
   </ItemGroup>
   <ItemGroup>

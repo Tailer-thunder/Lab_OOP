@@ -6,7 +6,7 @@ CustomMemoryResource::CustomMemoryResource(std::pmr::memory_resource* upstream_r
 
 CustomMemoryResource::~CustomMemoryResource() {
     for (auto ptr : allocated_blocks) {
-        upstream->deallocate(ptr, 0, 0); // Освобождаем память
+        upstream->deallocate(ptr, 0, 0); 
     }
 }
 
