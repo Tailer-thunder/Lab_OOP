@@ -1,35 +1,34 @@
 #ifndef DYNAMIC_ARRAY_H
 #define DYNAMIC_ARRAY_H
 
-#include <cstddef>  // Для size_t
-#include <stdexcept> // Для std::out_of_range
+#include <memory_resource>
+#include <stdexcept>
+#include <new>
+#include <iterator>
 
 template <typename T>
 class DynamicArray {
 public:
-    // Конструктор
-    DynamicArray(size_t size = 0);
-    // Деструктор
+    explicit DynamicArray(std::pmr::memory_resource* memory_resource = std::pmr::get_default_resource());
     ~DynamicArray();
 
-    // Добавить элемент в конец
     void push_back(const T& value);
-    // Получить доступ к элементу по индексу
+
     T& operator[](size_t index);
     const T& operator[](size_t index) const;
 
-    // Получить размер массива
     size_t size() const;
-    // Получить ёмкость массива
     size_t capacity() const;
 
-    // Итератор для начала
     class Iterator {
     public:
         Iterator(T* ptr) : ptr(ptr) {}
+
         T& operator*() { return *ptr; }
         Iterator& operator++() { ++ptr; return *this; }
+        
         bool operator!=(const Iterator& other) const { return ptr != other.ptr; }
+        bool operator==(const Iterator& other) const { return ptr == other.ptr; } 
     private:
         T* ptr;
     };
@@ -38,80 +37,86 @@ public:
     Iterator end();
 
 private:
-    T* data;             // Массив данных
-    size_t current_size; // Текущий размер
-    size_t current_capacity; // Текущая ёмкость
+    std::pmr::memory_resource* memory_resource_;
+    T* data_;
+    size_t size_;
+    size_t capacity_;
 
-    // Перераспределить память
-    void reallocate(size_t new_size);
+    void reallocate(size_t new_capacity);
 };
 
-// Реализация
 
 template <typename T>
-DynamicArray<T>::DynamicArray(size_t size) 
-    : current_size(size), current_capacity(size) {
-    data = (size > 0) ? new T[size] : nullptr;
-}
+DynamicArray<T>::DynamicArray(std::pmr::memory_resource* memory_resource)
+    : memory_resource_(memory_resource), data_(nullptr), size_(0), capacity_(0) {}
+
 
 template <typename T>
 DynamicArray<T>::~DynamicArray() {
-    delete[] data;
+    for (size_t i = 0; i < size_; ++i) {
+        std::destroy_at(&data_[i]);
+    }
+    memory_resource_->deallocate(data_, capacity_ * sizeof(T), alignof(T));
 }
 
 template <typename T>
 void DynamicArray<T>::push_back(const T& value) {
-    if (current_size == current_capacity) {
-        reallocate(current_capacity == 0 ? 1 : current_capacity * 2);
+    if (size_ == capacity_) {
+        reallocate(capacity_ == 0 ? 1 : capacity_ * 2);
     }
-    data[current_size++] = value;
+    std::construct_at(&data_[size_], value);
+    ++size_;
 }
+
 
 template <typename T>
 T& DynamicArray<T>::operator[](size_t index) {
-    if (index >= current_size) {
+    if (index >= size_) {
         throw std::out_of_range("Index out of range");
     }
-    return data[index];
+    return data_[index];
 }
 
 template <typename T>
 const T& DynamicArray<T>::operator[](size_t index) const {
-    if (index >= current_size) {
+    if (index >= size_) {
         throw std::out_of_range("Index out of range");
     }
-    return data[index];
+    return data_[index];
 }
 
 template <typename T>
 size_t DynamicArray<T>::size() const {
-    return current_size;
+    return size_;
 }
 
 template <typename T>
 size_t DynamicArray<T>::capacity() const {
-    return current_capacity;
+    return capacity_;
 }
 
 template <typename T>
 typename DynamicArray<T>::Iterator DynamicArray<T>::begin() {
-    return Iterator(data);
+    return Iterator(data_);
 }
 
 template <typename T>
 typename DynamicArray<T>::Iterator DynamicArray<T>::end() {
-    return Iterator(data + current_size);
+    return Iterator(data_ + size_);
 }
 
 template <typename T>
-void DynamicArray<T>::reallocate(size_t new_size) {
-    T* new_data = new T[new_size];
-    for (size_t i = 0; i < current_size; ++i) {
-        new_data[i] = data[i];
+void DynamicArray<T>::reallocate(size_t new_capacity) {
+    T* new_data = static_cast<T*>(memory_resource_->allocate(new_capacity * sizeof(T), alignof(T)));
+    for (size_t i = 0; i < size_; ++i) {
+        std::construct_at(&new_data[i], std::move(data_[i]));
+        std::destroy_at(&data_[i]);
     }
-    delete[] data;
-    data = new_data;
-    current_capacity = new_size;
+    if (data_) {
+        memory_resource_->deallocate(data_, capacity_ * sizeof(T), alignof(T));
+    }
+    data_ = new_data;
+    capacity_ = new_capacity;
 }
 
 #endif // DYNAMIC_ARRAY_H

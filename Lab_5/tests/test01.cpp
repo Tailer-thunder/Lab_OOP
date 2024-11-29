@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory_resource>
-#include "../include/dynamic_array.hpp"
-#include "../include/memory_resource.hpp"
+#include "../include/dynamic_array.h"
+#include "../include/memory_resource.h"
 
 
 TEST(DynamicArrayTests, PushBackAndAccess_Int) {
