@@ -15,12 +15,12 @@ bool Medved::is_medved() const {
 }
 
 bool Medved::fight(std::shared_ptr<Ork> other) {
-    fight_notify(other, false); // Орк убивает медведя
+    fight_notify(other, false); 
     return false;
 }
 
 bool Medved::fight(std::shared_ptr<Belka> other) {
-    fight_notify(other, true); // Медведь убивает белку
+    fight_notify(other, true); 
     return true;
 }
 
