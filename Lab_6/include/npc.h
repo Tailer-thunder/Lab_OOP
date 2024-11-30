@@ -6,7 +6,7 @@
 #include <string>
 #include <cmath>
 
-// “ип NPC
+
 enum NpcType {
     Unknown = 0,
     OrkType = 1,
