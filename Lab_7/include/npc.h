@@ -48,5 +48,5 @@ public:
     int get_kill_distance() const;
     void move(int shift_x, int shift_y, int max_x, int max_y);
     bool is_alive() const;
-    void must_die();
+    void must_die() ;
 };
